@@ -1,0 +1,14 @@
+diff --git a/VERSION b/VERSION
+index 5a82bd2..5f357f6 100644
+--- a/VERSION
++++ b/VERSION
+@@ -27,9 +27,6 @@ fi
+ # reproducible builds, see https://wiki.debian.org/ReproducibleBuilds
+ DATE_FMT="%Y-%m-%d"
+ TIME_FMT="%H:%M"
+-if [ -z "$SOURCE_DATE_EPOCH" -a -d .git -a $(git status --porcelain | grep -v "^??" | wc -l) -eq 0 ]; then
+-	SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+-fi
+ if [ -n "$SOURCE_DATE_EPOCH" ]; then
+ 	KCEMU_BUILD_DATE=$(date -u -d "@$SOURCE_DATE_EPOCH" "+$DATE_FMT" 2>/dev/null || date -u -r "$SOURCE_DATE_EPOCH" "+$DATE_FMT" 2>/dev/null || date -u "+$DATE_FMT")
+ 	KCEMU_BUILD_TIME=$(date -u -d "@$SOURCE_DATE_EPOCH" "+$TIME_FMT" 2>/dev/null || date -u -r "$SOURCE_DATE_EPOCH" "+$TIME_FMT" 2>/dev/null || date -u "+$TIME_FMT")

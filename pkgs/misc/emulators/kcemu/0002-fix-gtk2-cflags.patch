@@ -1,0 +1,13 @@
+diff --git a/src/util/Makefile.am b/src/util/Makefile.am
+index 9316914..08f7733 100644
+--- a/src/util/Makefile.am
++++ b/src/util/Makefile.am
+@@ -10,7 +10,7 @@ LIBS=
+ 
+ AM_CPPFLAGS = \
+ 	-I../../include \
+-	`gtk-config --cflags` \
++	`pkg-config --cflags gtk+-2.0` \
+ 	-DDEBUG
+ 
+ #wav2kc_SOURCES = \

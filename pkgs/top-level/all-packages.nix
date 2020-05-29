@@ -25628,6 +25628,8 @@ in
 
   keynav = callPackage ../tools/X11/keynav { };
 
+  kcemu = callPackage ../misc/emulators/kcemu { };
+
   kmon = callPackage ../tools/system/kmon { };
 
   kompose = callPackage ../applications/networking/cluster/kompose { };

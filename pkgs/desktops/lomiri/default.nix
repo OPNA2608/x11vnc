@@ -26,5 +26,6 @@ let
     ubuntu-download-manager = callPackage ./ubuntu-download-manager { };
     unity8 = callPackage ./unity8 { };
     settings-components = callPackage ./settings-components { };
+    gsettings-ubuntu-touch-schemas = callPackage ./gsettings-ubuntu-touch-schemas { };
   };
 in makeScope libsForQt5.newScope packages

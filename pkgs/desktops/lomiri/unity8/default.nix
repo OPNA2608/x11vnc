@@ -1,6 +1,6 @@
 { mkDerivation, lib, fetchFromGitHub, fetchpatch
-, cmake, cmake-extras
-, unity-api, geonames, qmenumodel, ubuntu-app-launch, gnome3, gtk3, mir_1, qtbase, ubuntu-ui-toolkit, libqtdbustest, libqtdbusmock, system-settings, indicator-network, gsettings-qt, deviceinfo, dbus-test-runner, libusermetrics, lightdm_qt, xvfb_run, ubuntu-download-manager, libevdev, qtquickcontrols2, pam, properties-cpp
+, cmake, cmake-extras, wrapGAppsHook, glib
+, unity-api, geonames, qmenumodel, ubuntu-app-launch, gnome3, gtk3, mir_1, qtbase, ubuntu-ui-toolkit, libqtdbustest, libqtdbusmock, system-settings, indicator-network, gsettings-qt, deviceinfo, dbus-test-runner, libusermetrics, lightdm_qt, xvfb_run, ubuntu-download-manager, libevdev, qtquickcontrols2, pam, properties-cpp, qtgraphicaleffects, settings-components, gsettings-ubuntu-touch-schemas
 }:
 
 mkDerivation rec {
@@ -25,14 +25,35 @@ mkDerivation rec {
     patchShebangs .
     substituteInPlace CMakeLists.txt \
       --replace 'ubuntu-app-launch-2' 'ubuntu-app-launch-3'
+    substituteInPlace include/paths.h.in \
+      --replace '@CMAKE_INSTALL_PREFIX@/@CMAKE_INSTALL_BINDIR@' '@CMAKE_INSTALL_FULL_BINDIR@'
     substituteInPlace tests/uqmlscene/CMakeLists.txt \
       --replace 'set_target_properties(uqmlscene PROPERTIES INCLUDE_DIRECTORIES $''\{XCB_INCLUDE_DIRS})' \
         'include_directories($''\{XCB_INCLUDE_DIRS})'
   '';
 
-  nativeBuildInputs = [ cmake cmake-extras ];
+  nativeBuildInputs = [ cmake cmake-extras wrapGAppsHook glib ];
 
-  buildInputs = [ unity-api geonames qmenumodel ubuntu-app-launch gnome3.gnome-desktop gtk3 mir_1 ubuntu-ui-toolkit libqtdbustest libqtdbusmock qtbase system-settings indicator-network gsettings-qt deviceinfo dbus-test-runner libusermetrics lightdm_qt xvfb_run ubuntu-download-manager libevdev qtquickcontrols2 pam properties-cpp ];
+  buildInputs = [ unity-api geonames qmenumodel ubuntu-app-launch gnome3.gnome-desktop gtk3 mir_1 ubuntu-ui-toolkit libqtdbustest libqtdbusmock qtbase system-settings indicator-network gsettings-qt deviceinfo dbus-test-runner libusermetrics lightdm_qt xvfb_run ubuntu-download-manager libevdev qtquickcontrols2 pam properties-cpp qtgraphicaleffects settings-components gsettings-ubuntu-touch-schemas
+  ];
+
+  dontWrapGApps = true;
+
+  # WIP
+  postInstall = ''
+    substituteInPlace $out/share/applications/unity8.desktop \
+      --replace "$out/$out/bin/" ""
+    mkdir $out/share/wayland-sessions
+    ln -s $out/share/applications/unity8.desktop $out/share/wayland-sessions/unity8.desktop
+  '';
+  preFixup = ''
+    ${glib.dev}/bin/glib-compile-schemas ${glib.makeSchemaPath "$out" "${pname}-${version}"}
+    qtWrapperArgs+=(
+      --prefix XDG_DATA_DIRS : ${glib.getSchemaPath gsettings-ubuntu-touch-schemas}
+      --prefix QML2_IMPORT_PATH : ${settings-components}/lib/qt5/qml
+      "''${gappsWrapperArgs[@]}"
+    )
+  '';
 
   meta = with lib; {
     description = "A convergent desktop environment.";

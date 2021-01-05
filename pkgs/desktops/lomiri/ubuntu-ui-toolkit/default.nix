@@ -24,6 +24,8 @@ mkDerivation rec {
 
   buildInputs = [ qtbase glib libnih qtpim qtquickcontrols2 qtsystems lttng-ust qtgraphicaleffects qtfeedback python3 ];
 
+  propagatedBuildInputs = [ qtfeedback ];
+
   postPatch = ''
     substituteInPlace features/ubuntu_common.prf \
       --replace 'CONFIG += warnings_are_errors' 'CONFIG += warnings_are_errors''\nQMAKE_CXXFLAGS_WARN_ON += -Wno-error=deprecated-declarations'

@@ -25,5 +25,6 @@ let
     libusermetrics = callPackage ./libusermetrics { };
     ubuntu-download-manager = callPackage ./ubuntu-download-manager { };
     unity8 = callPackage ./unity8 { };
+    settings-components = callPackage ./settings-components { };
   };
 in makeScope libsForQt5.newScope packages

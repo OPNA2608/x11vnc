@@ -856,6 +856,7 @@
   ./services/ttys/gpm.nix
   ./services/ttys/kmscon.nix
   ./services/wayland/cage.nix
+  ./services/wayland/desktop-manager/lomiri.nix
   ./services/video/epgstation/default.nix
   ./services/video/mirakurun.nix
   ./services/web-apps/atlassian/confluence.nix

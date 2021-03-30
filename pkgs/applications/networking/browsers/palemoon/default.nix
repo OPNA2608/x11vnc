@@ -9,6 +9,14 @@
 , withGTK3 ? true, gtk3
 }:
 
+# https://developer.palemoon.org/build/linux/
+assert lib.assertMsg (
+  !stdenv.cc.isGNU ||
+  lib.versionOlder "4.9" stdenv.cc.version ||
+  lib.strings.hasPrefix "6." stdenv.cc.version ||
+  lib.versionAtLeast "11" stdenv.cc.version
+) "Unsupported compiler (isGNU ${if stdenv.cc.isGNU then "true" else "false"}, version ${stdenv.cc.version}) for official build.";
+
 let
 
   libPath = lib.makeLibraryPath [ ffmpeg libpulseaudio ];

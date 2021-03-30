@@ -122,9 +122,17 @@ in stdenv.mkDerivation rec {
     '
   '';
 
-  buildPhase = "./mach build";
+  buildPhase = ''
+    runHook preBuild
+
+    ./mach build
+
+    runHook postBuild
+  '';
 
   installPhase = ''
+    runHook preInstall
+
     ./mach install
 
     # Fix missing icon due to wrong WMClass
@@ -138,6 +146,13 @@ in stdenv.mkDerivation rec {
       size=$n"x"$n
       install -Dm644 ./palemoon/branding/official/$iconname.png $out/share/icons/hicolor/$size/apps/palemoon.png
     done
+
+    runHook postInstall
+  '';
+
+  postInstall = ''
+    # Remove SDK cruft. FIXME: move to a separate output?
+    rm -r $out/{share/idl,include,lib/palemoon-devel-${version}}
   '';
 
   dontWrapGApps = true;

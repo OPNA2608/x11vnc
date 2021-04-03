@@ -7,24 +7,84 @@
 , unzip, xorg, wget, which, yasm, zip, zlib
 
 , withGTK3 ? true, gtk3
+
+# Enabling official branding requires very specific & approved build configuration
+# Upstream's approval of our build configuration, 2019-09-27:
+# > The build configuration looks perfectly fine for official branding.
+# https://forum.palemoon.org/viewtopic.php?f=37&t=23015&p=175625#p175631
+, withOfficialBranding ? true
+, mozconfig ? null
 }:
 
 # https://developer.palemoon.org/build/linux/
 assert lib.assertMsg (
-  !stdenv.cc.isGNU ||
-  lib.versionOlder "4.9" stdenv.cc.version ||
-  lib.strings.hasPrefix "6." stdenv.cc.version ||
-  lib.versionAtLeast "11" stdenv.cc.version
+  withOfficialBranding && (
+    !stdenv.cc.isGNU ||
+    lib.versionOlder "4.9" stdenv.cc.version ||
+    lib.strings.hasPrefix "6." stdenv.cc.version ||
+    lib.versionAtLeast "11" stdenv.cc.version
+  )
 ) "Unsupported compiler (isGNU ${if stdenv.cc.isGNU then "true" else "false"}, version ${stdenv.cc.version}) for official build.";
+assert lib.assertMsg (!withOfficialBranding && mozconfig == null) ''
+  You're attempting to build without official branding, please pass your .mozconfig build options as mozconfig.
+  Settings example: https://developer.palemoon.org/build/linux, section ".mozconfig file".
+'';
 
 let
-
   libPath = lib.makeLibraryPath [ ffmpeg libpulseaudio ];
-  gtkVersion = if withGTK3 then "3" else "2";
+  # Keep this similar to the official .mozconfig file,
+  # only minor changes for portability are permitted with branding.
+  # https://developer.palemoon.org/build/linux/
+  # x-libraries option & other approved NixOS specific settings
+  # are appended later.
+  officialMozconfig = ''
+    # Clear this if not a 64bit build
+    _BUILD_64=${lib.optionalString stdenv.hostPlatform.is64bit "1"}
 
-in stdenv.mkDerivation rec {
-  pname = "palemoon";
+    # Set GTK Version to 2 or 3
+    _GTK_VERSION=${if withGTK3 then "3" else "2"}
+
+    # Standard build options for Pale Moon
+    ac_add_options --enable-application=palemoon
+    ac_add_options --enable-optimize="-O2 -w"
+    ac_add_options --enable-default-toolkit=cairo-gtk$_GTK_VERSION
+    ac_add_options --enable-jemalloc
+    ac_add_options --enable-strip
+    ac_add_options --enable-devtools
+    ac_add_options --disable-eme
+    ac_add_options --disable-webrtc
+    ac_add_options --disable-gamepad
+    ac_add_options --disable-tests
+    ac_add_options --disable-debug
+    ac_add_options --disable-necko-wifi
+    ac_add_options --disable-updater
+    ac_add_options --with-pthreads
+
+    # Please see https://www.palemoon.org/redist.shtml for restrictions when using the official branding.
+    ac_add_options --enable-official-branding
+    export MOZILLA_OFFICIAL=1
+
+    # For versions after 28.12.0
+    ac_add_options --enable-phoenix-extensions
+
+    export MOZ_PKG_SPECIAL=gtk$_GTK_VERSION
+
+    #
+    # NixOS-specific adjustments
+    #
+
+    ac_add_options --x-libraries=${lib.makeLibraryPath [ xorg.libX11 ]}
+
+    ac_add_options --prefix=$out
+
+    mk_add_options MOZ_MAKE_FLAGS="-j${if enableParallelBuilding then "$NIX_BUILD_CORES" else "1"}"
+    mk_add_options AUTOCONF=${autoconf213}/bin/autoconf
+  '';
+  pname = if withOfficialBranding then "palemoon" else "newmoon";
   version = "29.1.0";
+
+in stdenv.mkDerivation {
+  inherit pname version;
 
   src = fetchFromGitHub {
     githubBase = "repo.palemoon.org";
@@ -178,7 +238,7 @@ in stdenv.mkDerivation rec {
       extensions and themes to make the browser truly your own.
     '';
     homepage    = "https://www.palemoon.org/";
-    license     = licenses.mpl20;
+    license     = [ licenses.mpl20 "https://www.palemoon.org/redist.shtml" ]; # branding has special redistribution license
     maintainers = with maintainers; [ AndersonTorres OPNA2608 ];
     platforms   = [ "i686-linux" "x86_64-linux" ];
   };

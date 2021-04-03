@@ -24749,7 +24749,9 @@ in
 
   osmscout-server = libsForQt5.callPackage ../applications/misc/osmscout-server { };
 
-  palemoon = callPackage ../applications/networking/browsers/palemoon { };
+  uxpPackages = recurseIntoAttrs (callPackage ../applications/networking/browsers/uxp/palemoon.nix { });
+  palemoon = uxpPackages.palemoon;
+  newmoon = uxpPackages.newmoon;
 
   webbrowser = callPackage ../applications/networking/browsers/webbrowser {};
 

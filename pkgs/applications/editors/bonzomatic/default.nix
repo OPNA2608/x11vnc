@@ -35,7 +35,7 @@ stdenv.mkDerivation rec {
     # CMakeFiles/bonzomatic.dir/src/platform_common/FFT.cpp.o: undefined reference to symbol 'dlclose@@GLIBC_2.2.5'
     # libdl.so.2: error adding symbols: DSO missing from command line
     substituteInPlace CMakeLists.txt \
-      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL asound fontconfig dl" \
+      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL ${lib.optionalString stdenv.hostPlatform.isLinux "asound fontconfig"} dl" \
       --replace "if (APPLE OR WIN32)" "if (WIN32)"
   '';
 

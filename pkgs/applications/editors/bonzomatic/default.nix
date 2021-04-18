@@ -1,8 +1,20 @@
-{ lib, stdenv, fetchFromGitHub
-, cmake, pkg-config, stb, miniaudio
-, glfw, glew, kissfft
-, alsaLib, fontconfig, libX11
-, AudioToolbox, AVFoundation, CoreAudio, CoreGraphics, Foundation
+{ lib
+, stdenv
+, fetchFromGitHub
+, cmake
+, pkg-config
+, stb
+, miniaudio
+, glfw
+, glew
+, kissfft
+, alsaLib
+, fontconfig
+, libX11
+, AVFoundation
+, Carbon
+, Cocoa
+, OpenGL
 }:
 
 stdenv.mkDerivation rec {
@@ -16,21 +28,23 @@ stdenv.mkDerivation rec {
     sha256 = "0gbh7kj7irq2hyvlzjgbs9fcns9kamz7g5p6msv12iw75z9yi330";
   };
 
-  postPatch = ''
+  postPatch = lib.optionalString stdenv.hostPlatform.isLinux ''
     # CMakeFiles/bonzomatic.dir/src/platform_common/FFT.cpp.o: undefined reference to symbol 'dlclose@@GLIBC_2.2.5'
     # libdl.so.2: error adding symbols: DSO missing from command line
     substituteInPlace CMakeLists.txt \
-      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL asound fontconfig dl" \
-      --replace "if (APPLE OR WIN32)" "if (WIN32)"
+      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL asound fontconfig dl"
   '';
 
-  nativeBuildInputs = [ cmake pkg-config stb miniaudio ];
+  nativeBuildInputs = [ cmake pkg-config stb miniaudio ]
+    ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [ stb miniaudio ];
 
-  buildInputs = [ glfw glew kissfft ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [ alsaLib fontconfig libX11 ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ AudioToolbox AVFoundation CoreAudio CoreGraphics Foundation ];
+  buildInputs =
+    if stdenv.hostPlatform.isDarwin then
+      [ AVFoundation Carbon Cocoa OpenGL ]
+    else
+      [ glfw glew kissfft alsaLib fontconfig libX11 ];
 
-  cmakeFlags = [
+  cmakeFlags = lib.optionals (!stdenv.hostPlatform.isDarwin) [
     "-DBONZOMATIC_USE_SYSTEM_GLFW=ON"
     "-DBONZOMATIC_USE_SYSTEM_GLEW=ON"
     "-DBONZOMATIC_USE_SYSTEM_STB=ON"

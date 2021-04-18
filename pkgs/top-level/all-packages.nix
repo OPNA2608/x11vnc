@@ -22136,6 +22136,7 @@ in
     kissfft = kissfft.override {
       datatype = "float";
     };
+    inherit (darwin.apple_sdk.frameworks) CoreAudio Foundation CoreGraphics;
   };
 
   bottles = callPackage ../applications/misc/bottles { };

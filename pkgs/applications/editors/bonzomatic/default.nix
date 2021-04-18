@@ -2,6 +2,7 @@
 , cmake, pkg-config, stb, miniaudio
 , glfw, glew, kissfft
 , alsaLib, fontconfig, libX11
+, CoreAudio, Foundation, CoreGraphics
 }:
 
 stdenv.mkDerivation rec {
@@ -26,7 +27,8 @@ stdenv.mkDerivation rec {
   nativeBuildInputs = [ cmake pkg-config stb miniaudio ];
 
   buildInputs = [ glfw glew kissfft ]
-    ++ lib.optionals stdenv.hostPlatform.isLinux [ alsaLib fontconfig libX11 ];
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ alsaLib fontconfig libX11 ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [ CoreAudio Foundation CoreGraphics ];
 
   cmakeFlags = [
     "-DBONZOMATIC_USE_SYSTEM_GLFW=ON"

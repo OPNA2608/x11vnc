@@ -11,10 +11,11 @@
 , alsaLib
 , fontconfig
 , libX11
+, AudioToolbox
 , AVFoundation
-, Carbon
-, Cocoa
-, OpenGL
+, CoreAudio
+, CoreGraphics
+, Foundation
 }:
 
 stdenv.mkDerivation rec {
@@ -30,23 +31,21 @@ stdenv.mkDerivation rec {
 
   patches = lib.optionals stdenv.hostPlatform.isDarwin [ ./0001-Remove-macOS-10.14-API-usage.patch ];
 
-  postPatch = lib.optionalString stdenv.hostPlatform.isLinux ''
+  postPatch = ''
     # CMakeFiles/bonzomatic.dir/src/platform_common/FFT.cpp.o: undefined reference to symbol 'dlclose@@GLIBC_2.2.5'
     # libdl.so.2: error adding symbols: DSO missing from command line
     substituteInPlace CMakeLists.txt \
-      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL asound fontconfig dl"
+      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL asound fontconfig dl" \
+      --replace "if (APPLE OR WIN32)" "if (WIN32)"
   '';
 
-  nativeBuildInputs = [ cmake pkg-config stb miniaudio ]
-    ++ lib.optionals (!stdenv.hostPlatform.isDarwin) [ stb miniaudio ];
+  nativeBuildInputs = [ cmake pkg-config stb miniaudio ];
 
-  buildInputs =
-    if stdenv.hostPlatform.isDarwin then
-      [ AVFoundation Carbon Cocoa OpenGL ]
-    else
-      [ glfw glew kissfft alsaLib fontconfig libX11 ];
+  buildInputs = [ glfw glew kissfft ]
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [ AudioToolbox AVFoundation CoreAudio CoreGraphics Foundation ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ alsaLib fontconfig libX11 ];
 
-  cmakeFlags = lib.optionals (!stdenv.hostPlatform.isDarwin) [
+  cmakeFlags = [
     "-DBONZOMATIC_USE_SYSTEM_GLFW=ON"
     "-DBONZOMATIC_USE_SYSTEM_GLEW=ON"
     "-DBONZOMATIC_USE_SYSTEM_STB=ON"
@@ -60,8 +59,5 @@ stdenv.mkDerivation rec {
     license = licenses.unlicense;
     maintainers = with maintainers; [ ilian ];
     platforms = platforms.mesaPlatforms;
-    # src/platform_osx/Misc.mm uses 10.14+ API
-    # https://developer.apple.com/documentation/avfoundation/avauthorizationstatus
-    # broken = stdenv.hostPlatform.isDarwin;
   };
 }

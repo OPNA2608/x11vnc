@@ -2,7 +2,7 @@
 , cmake, pkg-config, stb, miniaudio
 , glfw, glew, kissfft
 , alsaLib, fontconfig, libX11
-, CoreAudio, Foundation, CoreGraphics
+, AudioToolbox, AVFoundation, CoreAudio, CoreGraphics, Foundation
 }:
 
 stdenv.mkDerivation rec {
@@ -28,7 +28,7 @@ stdenv.mkDerivation rec {
 
   buildInputs = [ glfw glew kissfft ]
     ++ lib.optionals stdenv.hostPlatform.isLinux [ alsaLib fontconfig libX11 ]
-    ++ lib.optionals stdenv.hostPlatform.isDarwin [ CoreAudio Foundation CoreGraphics ];
+    ++ lib.optionals stdenv.hostPlatform.isDarwin [ AudioToolbox AVFoundation CoreAudio CoreGraphics Foundation ];
 
   cmakeFlags = [
     "-DBONZOMATIC_USE_SYSTEM_GLFW=ON"

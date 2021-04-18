@@ -16481,6 +16481,8 @@ in
 
   mimalloc = callPackage ../development/libraries/mimalloc { };
 
+  miniaudio = callPackage ../development/libraries/miniaudio { };
+
   minizip = callPackage ../development/libraries/minizip { };
 
   minizip2 = callPackage ../development/libraries/minizip2 { };

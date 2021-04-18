@@ -28,6 +28,8 @@ stdenv.mkDerivation rec {
     sha256 = "0gbh7kj7irq2hyvlzjgbs9fcns9kamz7g5p6msv12iw75z9yi330";
   };
 
+  patches = lib.optionals stdenv.hostPlatform.isDarwin [ ./0001-Remove-macOS-10.14-API-usage.patch ];
+
   postPatch = lib.optionalString stdenv.hostPlatform.isLinux ''
     # CMakeFiles/bonzomatic.dir/src/platform_common/FFT.cpp.o: undefined reference to symbol 'dlclose@@GLIBC_2.2.5'
     # libdl.so.2: error adding symbols: DSO missing from command line
@@ -58,5 +60,8 @@ stdenv.mkDerivation rec {
     license = licenses.unlicense;
     maintainers = with maintainers; [ ilian ];
     platforms = platforms.mesaPlatforms;
+    # src/platform_osx/Misc.mm uses 10.14+ API
+    # https://developer.apple.com/documentation/avfoundation/avauthorizationstatus
+    # broken = stdenv.hostPlatform.isDarwin;
   };
 }

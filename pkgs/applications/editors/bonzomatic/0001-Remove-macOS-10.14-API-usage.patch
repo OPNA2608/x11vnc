@@ -1,0 +1,32 @@
+From d68c351a8fda18399547d07e4770843f7d5001a9 Mon Sep 17 00:00:00 2001
+From: OPNA2608 <christoph.neidahl@gmail.com>
+Date: Sun, 18 Apr 2021 23:59:57 +0200
+Subject: [PATCH] Remove macOS 10.14 API usage
+
+---
+ src/platform_osx/Misc.mm | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/src/platform_osx/Misc.mm b/src/platform_osx/Misc.mm
+index 017f826..c09cc60 100644
+--- a/src/platform_osx/Misc.mm
++++ b/src/platform_osx/Misc.mm
+@@ -17,6 +17,7 @@
+ @implementation MiscCocoa
+ 
+ + (void)requestMicrophoneAccess {
++/*
+   switch ([AVCaptureDevice authorizationStatusForMediaType:AVMediaTypeAudio])
+   {
+     case AVAuthorizationStatusAuthorized:
+@@ -52,6 +53,7 @@
+       fprintf(stderr, "The user can't grant microphone access due to restrictions.\n");
+     }
+   }
++*/
+ }
+ 
+ @end
+-- 
+2.29.3
+

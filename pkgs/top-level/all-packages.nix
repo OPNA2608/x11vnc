@@ -22132,7 +22132,11 @@ in
 
   bombono = callPackage ../applications/video/bombono {};
 
-  bonzomatic = callPackage ../applications/editors/bonzomatic { };
+  bonzomatic = callPackage ../applications/editors/bonzomatic {
+    kissfft = kissfft.override {
+      datatype = "float";
+    };
+  };
 
   bottles = callPackage ../applications/misc/bottles { };
 

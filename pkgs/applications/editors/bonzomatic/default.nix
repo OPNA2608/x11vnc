@@ -1,6 +1,7 @@
 { lib, stdenv, fetchFromGitHub
-, cmake, makeWrapper
-, alsaLib, fontconfig, mesa_glu, libXcursor, libXinerama, libXrandr, xorg
+, cmake, pkg-config, stb, miniaudio
+, glfw, glew, kissfft
+, alsaLib, fontconfig, libX11
 }:
 
 stdenv.mkDerivation rec {
@@ -14,21 +15,31 @@ stdenv.mkDerivation rec {
     sha256 = "0gbh7kj7irq2hyvlzjgbs9fcns9kamz7g5p6msv12iw75z9yi330";
   };
 
-  nativeBuildInputs = [ cmake makeWrapper ];
-  buildInputs = [
-    alsaLib fontconfig mesa_glu
-    libXcursor libXinerama libXrandr xorg.xinput xorg.libXi xorg.libXext
-  ];
-
-  postFixup = ''
-    wrapProgram $out/bin/bonzomatic --prefix LD_LIBRARY_PATH : "${alsaLib}/lib"
+  postPatch = ''
+    # CMakeFiles/bonzomatic.dir/src/platform_common/FFT.cpp.o: undefined reference to symbol 'dlclose@@GLIBC_2.2.5'
+    # libdl.so.2: error adding symbols: DSO missing from command line
+    substituteInPlace CMakeLists.txt \
+      --replace "PLATFORM_LIBS GL asound fontconfig" "PLATFORM_LIBS GL asound fontconfig dl"
   '';
+
+  nativeBuildInputs = [ cmake pkg-config stb miniaudio ];
+
+  buildInputs = [ glfw glew kissfft ]
+    ++ lib.optionals stdenv.hostPlatform.isLinux [ alsaLib fontconfig libX11 ];
+
+  cmakeFlags = [
+    "-DBONZOMATIC_USE_SYSTEM_GLFW=ON"
+    "-DBONZOMATIC_USE_SYSTEM_GLEW=ON"
+    "-DBONZOMATIC_USE_SYSTEM_STB=ON"
+    "-DBONZOMATIC_USE_SYSTEM_MINIAUDIO=ON"
+    "-DBONZOMATIC_USE_SYSTEM_KISSFFT=ON"
+  ];
 
   meta = with lib; {
     description = "Live shader coding tool and Shader Showdown workhorse";
     homepage = "https://github.com/gargaj/bonzomatic";
     license = licenses.unlicense;
-    maintainers = [ maintainers.ilian ];
-    platforms = [ "i686-linux" "x86_64-linux" ];
+    maintainers = with maintainers; [ ilian ];
+    platforms = platforms.mesaPlatforms;
   };
 }

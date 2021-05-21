@@ -11452,7 +11452,8 @@ in
 
   opam-installer = callPackage ../development/tools/ocaml/opam/installer.nix { };
 
-  open-watcom-bin = callPackage ../development/compilers/open-watcom-bin { };
+  open-watcom-v2 = callPackage ../development/compilers/open-watcom { };
+  open-watcom-bin = callPackage ../development/compilers/open-watcom/bin.nix { };
 
   pforth = callPackage ../development/compilers/pforth {};
 

@@ -2971,6 +2971,8 @@ in
 
   libpsm2 = callPackage ../os-specific/linux/libpsm2 { };
 
+  openeuphoria = callPackage ../development/compilers/openeuphoria { };
+
   optar = callPackage ../tools/graphics/optar {};
 
   obinskit = callPackage ../applications/misc/obinskit {};

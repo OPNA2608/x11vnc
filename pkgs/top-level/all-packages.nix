@@ -2543,6 +2543,11 @@ in
 
   frangipanni = callPackage ../tools/text/frangipanni { };
 
+  freebasic = if stdenv.hostPlatform.isDarwin then
+    callPackage ../development/compilers/freebasic/mac.nix { }
+  else
+    callPackage ../development/compilers/freebasic { };
+
   fselect = callPackage ../tools/misc/fselect { };
 
   fsmon = callPackage ../tools/misc/fsmon { };

@@ -28333,6 +28333,9 @@ in
 
   odamex = callPackage ../games/odamex { };
 
+  ohrrpgce-unstable = callPackage ../games/ohrrpgce { };
+  ohrrpgce = ohrrpgce-unstable; # until gorgonzola is packaged or hrodvitnir is properly released
+
   oilrush = callPackage ../games/oilrush { };
 
   onscripter-en = callPackage ../games/onscripter-en { };

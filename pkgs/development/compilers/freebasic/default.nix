@@ -22,7 +22,7 @@ stdenv.mkDerivation rec {
   makeFlags = [ "prefix=${placeholder "out"}" ];
 
   preBuild = ''
-    make bootstrap ${lib.optionalString enableParallelBuilding "-j$NIX_BUILD_CORES -l$NIX_BUILD_CORES"}
+    make bootstrap ${lib.optionalString enableParallelBuilding "-j$NIX_BUILD_CORES"}
     buildFlagsArray+=("FBC=$PWD/bin/fbc -i $PWD/inc")
   '';
 

@@ -79,10 +79,10 @@ stdenv.mkDerivation rec {
 
     for exe in $(find $out/lib/openwatcom/${builtins.head bindirs}/ -type f -executable ${lib.optionalString stdenv.hostPlatform.isLinux "-not -iname '*.so' -not -iname '*.exe'"}); do
       makeWrapper $exe $out/bin/$(basename $exe) \
-        --set WATCOM $out/lib/openwatcom \
+        --set-default WATCOM $out/lib/openwatcom \
         --prefix PATH : ${lib.strings.concatMapStringsSep ":" (dir: "${placeholder "out"}/lib/openwatcom/${dir}") bindirs} \
-        --set EDPATH $out/lib/openwatcom/eddat \
-        --set INCLUDE $out/lib/openwatcom/${lib.optionalString (!stdenv.hostPlatform.isWindows) "l"}h
+        --set-default EDPATH $out/lib/openwatcom/eddat \
+        --set-default INCLUDE $out/lib/openwatcom/${lib.optionalString (!stdenv.hostPlatform.isWindows) "l"}h
     done
 
     runHook postInstall

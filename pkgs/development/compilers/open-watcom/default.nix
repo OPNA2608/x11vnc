@@ -22,13 +22,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "open-watcom-v2";
-  version = "unstable-2021-05-19";
+  version = "unstable-2021-06-05";
 
   src = fetchFromGitHub {
     owner = "open-watcom";
     repo = "open-watcom-v2";
-    rev = "6229b099ecc3df1c5199940e205b9757e8b4081d";
-    sha256 = "13f3gsr7xmhp8fabmqqh512vr937v7259sh1k1ax5cxqizbbh00c";
+    rev = "86ed2afe90f09fd27ca48b04a7f766178d30647e";
+    sha256 = "18fz4p5q0d7ij3q62hrnz2lf428hck1h97gxkwh809z6852jwv6h";
   };
 
   postPatch = ''

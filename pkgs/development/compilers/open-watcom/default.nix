@@ -33,6 +33,9 @@ stdenv.mkDerivation rec {
 
   postPatch = ''
     patchShebangs *.sh
+    substituteInPlace bld/watcom/h/banner.h \
+      --replace '__TIME__' "\"$(date -ud "@$SOURCE_DATE_EPOCH")\"" \
+      --replace '_MACROSTR( _CYEAR )' "\"$(date -ud "@$SOURCE_DATE_EPOCH" '+%Y')\""
   '' + lib.optionalString (!stdenv.hostPlatform.isDarwin) ''
     substituteInPlace build/mif/local.mif \
       --replace '-static' '-L ${stdenv.cc.libc.static}/lib -static'

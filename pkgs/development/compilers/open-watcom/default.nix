@@ -22,13 +22,13 @@ let
 in
 stdenv.mkDerivation rec {
   pname = "open-watcom-v2";
-  version = "unstable-2021-06-05";
+  version = "unstable-2021-06-16";
 
   src = fetchFromGitHub {
     owner = "open-watcom";
     repo = "open-watcom-v2";
-    rev = "86ed2afe90f09fd27ca48b04a7f766178d30647e";
-    sha256 = "18fz4p5q0d7ij3q62hrnz2lf428hck1h97gxkwh809z6852jwv6h";
+    rev = "aa8d53943c877f1290294e5b85f53836c461802d";
+    sha256 = "12digi6jnd91x7qczmcmwwsrqxjkjis8ww3saki8zc8kplqcbfy4";
   };
 
   postPatch = ''
@@ -40,8 +40,6 @@ stdenv.mkDerivation rec {
     substituteInPlace build/mif/local.mif \
       --replace '-static' '-L ${stdenv.cc.libc.static}/lib -static'
   '';
-
-  hardeningDisable = [ "format" ];
 
   nativeBuildInputs = [ makeWrapper ]
     ++ lib.optional (withDocs || withGUI) dosbox

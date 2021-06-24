@@ -22792,6 +22792,8 @@ in
 
   schismtracker = callPackage ../applications/audio/schismtracker { };
 
+  trackerboy = libsForQt5.callPackage ../applications/audio/trackerboy { };
+
   jnetmap = callPackage ../applications/networking/jnetmap {};
 
   libbitcoin = callPackage ../tools/misc/libbitcoin/libbitcoin.nix { };
